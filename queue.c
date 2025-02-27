@@ -14,10 +14,9 @@
 struct list_head *q_new()
 {
     struct list_head *q = malloc(sizeof(struct list_head));
-    q->next = q;
-    q->prev = q;
-    if (!q)
+    if (q == NULL)
         return NULL;
+    INIT_LIST_HEAD(q);
     return q;
 }
 
