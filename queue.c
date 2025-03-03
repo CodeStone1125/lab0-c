@@ -103,7 +103,13 @@ bool q_insert_tail(struct list_head *head, char *s)
 /* Remove an element from head of queue */
 element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (head == NULL || head->next == head)
+        return NULL;
+    element_t *e_rm = list_entry(head->next, element_t, list);
+    list_del(&e_rm->list);
+    if (sp != NULL)
+        strlcpy(sp, e_rm->value, bufsize - 1);
+    return e_rm;
 }
 
 /* Remove an element from tail of queue */
