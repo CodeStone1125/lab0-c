@@ -220,7 +220,36 @@ void q_sort(struct list_head *head, bool descend) {}
 int q_ascend(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
-    return 0;
+    if (head == NULL || list_empty(head)) {
+        return 0;
+    } else if (list_is_singular(head)) {
+        return 1;
+    }
+
+    struct list_head *stack =
+        (struct list_head *) malloc(sizeof(struct list_head));
+    INIT_LIST_HEAD(stack);
+
+    struct list_head *entry;
+    struct list_head *safe;
+
+    list_for_each_safe (entry, safe, head) {
+        element_t const *current = list_entry(entry, element_t, list);
+        list_del(entry);
+
+        while (!list_empty(stack) &&
+               strcmp(list_entry(stack->prev, element_t, list)->value,
+                      current->value) > 0) {
+            element_t *pop = list_entry(stack->prev, element_t, list);
+            list_del(&pop->list);
+            free(pop->value);
+            free(pop);
+        }
+        list_add_tail(entry, stack);
+    }
+    list_splice_tail_init(stack, head);
+    free(stack);
+    return q_size(head);
 }
 
 /* Remove every node which has a node with a strictly greater value anywhere to
@@ -228,7 +257,40 @@ int q_ascend(struct list_head *head)
 int q_descend(struct list_head *head)
 {
     // https://leetcode.com/problems/remove-nodes-from-linked-list/
-    return 0;
+    if (head == NULL || list_empty(head)) {
+        return 0;
+    } else if (list_is_singular(head)) {
+        return 1;
+    }
+
+    struct list_head *stack =
+        (struct list_head *) malloc(sizeof(struct list_head));
+    INIT_LIST_HEAD(stack);
+
+    struct list_head *entry;
+    struct list_head *safe;
+
+    list_for_each_safe (entry, safe, head) {
+        element_t const *current = list_entry(entry, element_t, list);
+        list_del(entry);
+
+        // Compare to the stack, and pop smaller elements
+        while (!list_empty(stack) &&
+               strcmp(list_entry(stack->prev, element_t, list)->value,
+                      current->value) < 0) {
+            element_t *pop = list_entry(stack->prev, element_t, list);
+            list_del(&pop->list);
+            free(pop->value);
+            free(pop);
+        }
+
+        // Add the current node to the stack
+        list_add_tail(entry, stack);
+    }
+
+    list_splice_tail_init(stack, head);
+    free(stack);
+    return q_size(head);  // Return the size of the updated list
 }
 
 /* Merge all the queues into one sorted queue, which is in ascending/descending
