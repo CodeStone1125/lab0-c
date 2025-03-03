@@ -55,6 +55,10 @@ bool q_insert_head(struct list_head *head, char *s)
         head->next->prev = &e_new->list;
     }
     head->next = &e_new->list;
+
+    queue_contex_t *q_ctx =
+        list_entry((struct list_head *const *) head, queue_contex_t, q);
+    q_ctx->size++;
     return true;
 }
 
