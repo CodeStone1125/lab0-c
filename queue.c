@@ -115,7 +115,13 @@ element_t *q_remove_head(struct list_head *head, char *sp, size_t bufsize)
 /* Remove an element from tail of queue */
 element_t *q_remove_tail(struct list_head *head, char *sp, size_t bufsize)
 {
-    return NULL;
+    if (head == NULL || head->next == head)
+        return NULL;
+    element_t *e_rm = list_entry(head->prev, element_t, list);
+    list_del(&e_rm->list);
+    if (sp != NULL)
+        strlcpy(sp, e_rm->value, bufsize - 1);
+    return e_rm;
 }
 
 /* Return number of elements in queue */
