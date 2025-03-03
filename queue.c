@@ -13,15 +13,12 @@
 /* Create an empty queue */
 struct list_head *q_new()
 {
-    queue_contex_t *q_ctx = malloc(sizeof(queue_contex_t));
-    if (q_ctx == NULL)
+    element_t *e_new = malloc(sizeof(element_t));
+    if (e_new == NULL)
         return NULL;
-    q_ctx->q = (struct list_head *) malloc(sizeof(struct list_head));
-    INIT_LIST_HEAD(q_ctx->q);
-    INIT_LIST_HEAD(&q_ctx->chain);
-    q_ctx->size = 0;
-    q_ctx->id = 0;  // Just for test
-    return q_ctx->q;
+    INIT_LIST_HEAD(&e_new->list);
+    e_new->value = NULL;
+    return &e_new->list;
 }
 
 /* Free all storage used by queue */
