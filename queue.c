@@ -200,9 +200,7 @@ void q_reverse(struct list_head *head)
     if (head == NULL || list_empty(head) || list_is_singular(head))
         return;
     int count = q_size(head);
-    for (int i = 0; i < count - 1; i++) {
-        list_move_tail(head->next, head);
-    }
+    q_reverseK(head, count);
     return;
 }
 
