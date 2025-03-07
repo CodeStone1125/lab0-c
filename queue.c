@@ -417,9 +417,12 @@ int q_merge(struct list_head *head, bool descend)
     struct list_head *cur = head->next->next;
     while ((uintptr_t) cur != (uintptr_t) head) {
         queue_contex_t *ctx = list_entry(cur, queue_contex_t, chain);
-        first->q = mergeTwoList(first->q, ctx->q, descend);
-        ctx->q = NULL;
+        list_splice_init(ctx->q, first->q);
+        ctx->size = 0;
         cur = cur->next;
     }
-    return q_size(first->q);
+    q_sort(first->q, descend);
+    first->size = q_size(first->q);
+    return first->size;
 }
+
