@@ -1,8 +1,8 @@
+#include "queue.h"
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "queue.h"
 
 /* Notice: sometimes, Cppcheck would find the potential NULL pointer bugs,
  * but some of them cannot occur. You can suppress them by adding the
@@ -285,7 +285,6 @@ struct list_head *mergeTwoList(struct list_head *left,
             (descend && strcmp(e_left->value, e_right->value) > 0)) {
             list_del_init(&e_left->list);
             list_add_tail(&e_left->list, &result);
-
         } else {
             list_del_init(&e_right->list);
             list_add_tail(&e_right->list, &result);
@@ -300,26 +299,24 @@ struct list_head *mergeTwoList(struct list_head *left,
     }
 }
 
-/* Sort elements of queue in ascending/descending order */
+
+// /* Sort elements of queue in ascending/descending order */
 void q_sort(struct list_head *head, bool descend)
 {
     if (!head || list_empty(head) || list_is_singular(head))
         return;
-
     struct list_head *slow = head;
     for (struct list_head const *fast = head;
          fast->next->next != head && fast->next != head;
          fast = fast->next->next) {
         slow = slow->next;
     }
-
     LIST_HEAD(left);
     LIST_HEAD(right);
     list_cut_position(&left, head, slow);
     list_splice_tail_init(head, &right);
     q_sort(&left, true);
     q_sort(&right, true);
-
     struct list_head *result = mergeTwoList(&left, &right, true);
     list_splice_tail(result, head);
     if (!descend)
@@ -410,5 +407,19 @@ int q_descend(struct list_head *head)
 int q_merge(struct list_head *head, bool descend)
 {
     // https://leetcode.com/problems/merge-k-sorted-lists/
-    return 0;
+    if (!head || list_empty(head))
+        return 0;
+
+    queue_contex_t *first = list_entry(head->next, queue_contex_t, chain);
+    if (list_is_singular(head))
+        return q_size(first->q);
+    // struct list_head *del_tmp = first->q;
+    struct list_head *cur = head->next->next;
+    while ((uintptr_t) cur != (uintptr_t) head) {
+        queue_contex_t *ctx = list_entry(cur, queue_contex_t, chain);
+        first->q = mergeTwoList(first->q, ctx->q, descend);
+        ctx->q = NULL;
+        cur = cur->next;
+    }
+    return q_size(first->q);
 }
