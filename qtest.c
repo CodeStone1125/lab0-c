@@ -23,6 +23,9 @@
 #include "list.h"
 #include "random.h"
 
+void lx_sort(struct list_head *head);
+void shuffle(struct list_head *head);
+
 /* Shannon entropy */
 extern double shannon_entropy(const uint8_t *input_data);
 extern int show_entropy;
@@ -1147,6 +1150,29 @@ static bool do_next(int argc, char *argv[])
     return q_show(0);
 }
 
+/* Fisher–Yates shuffle  */
+static bool do_shuffle(int argc, char *argv[])
+{
+    if (argc != 1) {
+        report(1, "%s takes no arguments", argv[0]);
+        return false;
+    }
+
+    if (!current || !current->q) {
+        report(3, "Warning: Try to access null queue");
+        return false;
+    }
+    error_check();
+
+    bool ok = true;
+    if (exception_setup(true))
+        shuffle(current->q);
+    exception_cancel();
+
+    q_show(3);
+    return ok && !error_check();
+}
+
 static void console_init()
 {
     ADD_COMMAND(new, "Create new queue", "");
@@ -1188,6 +1214,7 @@ static void console_init()
                 "");
     ADD_COMMAND(reverseK, "Reverse the nodes of the queue 'K' at a time",
                 "[K]");
+    ADD_COMMAND(shuffle, "Fisher-Yates shuffle", "");
     add_param("length", &string_length, "Maximum length of displayed string",
               NULL);
     add_param("malloc", &fail_probability, "Malloc failure probability percent",

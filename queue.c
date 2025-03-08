@@ -429,7 +429,7 @@ int q_merge(struct list_head *head, bool descend)
 /* Reference lib/list_sort.corder */
 static struct list_head *lx_merge(struct list_head *a, struct list_head *b)
 {
-    struct list_head *head, **tail = &head;
+    struct list_head *head = NULL, **tail = &head;
 
     for (;;) {
         /* if equal, take 'a' -- important for sort stability */
@@ -546,4 +546,22 @@ void lx_sort(struct list_head *head)
     }
     /* The final merge, rebuilding prev links */
     lx_merge_final(head, pending, list);
+}
+
+
+void shuffle(struct list_head *head)
+{
+    if (!head || list_empty(head) || list_is_singular(head))
+        return;
+    struct list_head *node = head->next;
+    for (int i = q_size(head); i >= 2; i--) {
+        int random = rand() % i;
+        for (int j = 0; j < random; j++)
+            node = node->next;
+
+        list_del(node);
+        list_add_tail(node, head);
+        node = head->next;
+    }
+    return;
 }
