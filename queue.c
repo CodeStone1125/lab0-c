@@ -596,6 +596,7 @@ void sediment_sort(struct list_head *head)
                     node->next->next = node;
                     node->next = __next;
                     node = __prev->next;
+                    last_swapped = __next;
                     swapped = 1;
                 }
             }
