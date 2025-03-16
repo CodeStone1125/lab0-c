@@ -609,6 +609,49 @@ void sediment_sort(struct list_head *head)
     rebuild_list_link(head);
 }
 
+void insert_bst(struct list_head **bst_root, struct list_head *node)
+{
+    node->prev = NULL;
+    node->next = NULL;
+    if (!*bst_root) {
+        *bst_root = node;
+        return;
+    }
+    element_t const *e_node = list_entry(node, element_t, list);
+    element_t const *e_root = list_entry(*bst_root, element_t, list);
+    if (strcmp(e_node->value, e_root->value) <= 0) {
+        insert_bst(&(*bst_root)->prev, node);
+    } else {
+        insert_bst(&(*bst_root)->next, node);
+    }
+    return;
+}
+
+void traverse(struct list_head **bst_root, struct list_head **head)
+{
+    struct list_head *work;
+    if (*bst_root) {
+        traverse(&(*bst_root)->prev, head);
+        work = (*bst_root)->next;
+        list_add_tail(*bst_root, *head);
+        traverse(&work, head);
+    }
+    return;
+}
+
+void tree_sort(struct list_head *head)
+{
+    struct list_head *bst_root = NULL;
+    struct list_head *node;
+    struct list_head *safe;
+    list_for_each_safe (node, safe, head) {
+        list_del_init(node);
+        insert_bst(&bst_root, node);
+    }
+    traverse(&bst_root, &head);
+    return;
+}
+
 void shuffle(struct list_head *head)
 {
     if (!head || list_empty(head) || list_is_singular(head))
