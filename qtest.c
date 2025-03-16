@@ -26,6 +26,7 @@
 void lx_sort(struct list_head *head);
 void sediment_sort(struct list_head *head);
 void tree_sort(struct list_head *head);
+void quick_sort(struct list_head *head);
 void shuffle(struct list_head *head);
 
 /* Shannon entropy */
@@ -627,6 +628,8 @@ bool do_c_sort(int argc, char *argv[])
             sediment_sort(current->q);
         } else if (strcmp(sort_method, "-t") == 0) {
             tree_sort(current->q);
+        } else if (strcmp(sort_method, "-q") == 0) {
+            quick_sort(current->q);
         } else {
             report(1, "Invalid sorting method: %s", sort_method);
             return false;
@@ -1214,7 +1217,7 @@ static void console_init()
     ADD_COMMAND(sort, "Sort queue in ascending/descening order", "");
     ADD_COMMAND(c_sort,
                 "Various sorting queue methods, -t:tree_sort, -s:sediment_sort "
-                ", -m:lx_sort",
+                ", -m:lx_sort, -q:quick_sort",
                 "");
     ADD_COMMAND(size, "Compute queue size n times (default: n == 1)", "[n]");
     ADD_COMMAND(show, "Show queue contents", "");
