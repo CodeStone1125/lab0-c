@@ -548,6 +548,64 @@ void lx_sort(struct list_head *head)
     lx_merge_final(head, pending, list);
 }
 
+static void rebuild_list_link(struct list_head *head)
+{
+    if (!head)
+        return;
+    struct list_head *node, *prev;
+    prev = head;
+    node = head->next;
+    while (node) {
+        node->prev = prev;
+        prev = node;
+        node = node->next;
+    }
+    prev->next = head;
+    head->prev = prev;
+}
+
+void sediment_sort(struct list_head *head)
+{
+    struct list_head *list = head->next;
+
+    if (list == head->prev) /* Zero or one elements */
+        return;
+
+    /* Convert to a null-terminated singly-linked list. */
+    head->prev->next = NULL;
+
+    struct list_head *new_tail = NULL; /* New bound of sort */
+    struct list_head *__prev;          /* Temporary pointer for swap */
+    bool done = false;
+
+    do {
+        int swapped = -1;
+        // done = false;
+        __prev = head;
+        for (struct list_head *node = head->next; node != new_tail;
+             node = node->next) {
+            element_t const *e = list_entry(node, element_t, list);
+            if (node->next != new_tail) {
+                element_t const *e_next =
+                    list_entry(node->next, element_t, list);
+                if (strcmp(e->value, e_next->value) > 0) {
+                    /* Swap two adjacency node */
+                    struct list_head *__next = node->next->next;
+                    __prev->next = node->next;
+                    node->next->next = node;
+                    node->next = __next;
+                    node = __prev->next;
+                    swapped = 1;
+                }
+            }
+            __prev = node;
+            new_tail = (node == new_tail && swapped) ? __prev : new_tail;
+        }
+        done = (swapped == -1);
+
+    } while (!done);
+    rebuild_list_link(head);
+}
 
 void shuffle(struct list_head *head)
 {

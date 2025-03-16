@@ -24,6 +24,7 @@
 #include "random.h"
 
 void lx_sort(struct list_head *head);
+void sediment_sort(struct list_head *head);
 void shuffle(struct list_head *head);
 
 /* Shannon entropy */
