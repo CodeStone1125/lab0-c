@@ -581,12 +581,15 @@ static bool do_size(int argc, char *argv[])
     return ok && !error_check();
 }
 
-bool do_lx_sort(int argc, char *argv[])
+bool do_c_sort(int argc, char *argv[])
 {
-    if (argc != 1) {
+    if (argc != 2) {
         report(1, "%s takes no arguments", argv[0]);
         return false;
     }
+
+    /* Get sorting method */
+    const char *sort_method = argv[1];
 
     int cnt = 0;
     if (!current || !current->q)
@@ -617,8 +620,18 @@ bool do_lx_sort(int argc, char *argv[])
                "number of elements %d is too large, exceeds the limit %d.",
                current->size, MAX_NODES);
 
-    if (current && exception_setup(true))
-        lx_sort(current->q);
+    if (current && exception_setup(true)) {
+        if (strcmp(sort_method, "-l") == 0) {
+            lx_sort(current->q);
+        } else if (strcmp(sort_method, "-s") == 0) {
+            sediment_sort(current->q);
+        } else if (strcmp(sort_method, "-t") == 0) {
+            tree_sort(current->q);
+        } else {
+            report(1, "Invalid sorting method: %s", sort_method);
+            return false;
+        }
+    }
     exception_cancel();
     set_noallocate_mode(false);
 
@@ -1199,7 +1212,10 @@ static void console_init()
         "[str]");
     ADD_COMMAND(reverse, "Reverse queue", "");
     ADD_COMMAND(sort, "Sort queue in ascending/descening order", "");
-    ADD_COMMAND(lx_sort, "Sort queue with linux version sort", "");
+    ADD_COMMAND(c_sort,
+                "Various sorting queue methods, -t:tree_sort, -s:sediment_sort "
+                ", -m:lx_sort",
+                "");
     ADD_COMMAND(size, "Compute queue size n times (default: n == 1)", "[n]");
     ADD_COMMAND(show, "Show queue contents", "");
     ADD_COMMAND(dm, "Delete middle node in queue", "");
