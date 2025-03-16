@@ -580,6 +580,7 @@ void sediment_sort(struct list_head *head)
 
     do {
         int swapped = -1;
+        struct list_head *last_swapped = new_tail;
         // done = false;
         __prev = head;
         for (struct list_head *node = head->next; node != new_tail;
@@ -599,8 +600,8 @@ void sediment_sort(struct list_head *head)
                 }
             }
             __prev = node;
-            new_tail = (node == new_tail && swapped) ? __prev : new_tail;
         }
+        new_tail = last_swapped;
         done = (swapped == -1);
 
     } while (!done);
